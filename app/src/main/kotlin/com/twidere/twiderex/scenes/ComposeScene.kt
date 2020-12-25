@@ -106,6 +106,7 @@ import com.twidere.twiderex.viewmodel.DraftItemViewModel
 import com.twitter.twittertext.TwitterTextConfiguration
 import com.twitter.twittertext.TwitterTextParser
 import kotlinx.coroutines.launch
+import java.lang.StringBuilder
 
 enum class ComposeType {
     New,
@@ -361,12 +362,16 @@ private fun ComposeBody(
                     Spacer(modifier = Modifier.weight(1F))
                     if (locationEnabled) {
                         location?.let {
+                            var address = StringBuilder()
+                            for (i in 0..it.maxAddressLineIndex){
+                                address.append(it.getAddressLine(i))
+                            }
                             Providers(
                                 AmbientContentAlpha provides ContentAlpha.medium
                             ) {
                                 Row {
                                     Icon(imageVector = vectorResource(id = R.drawable.ic_map_pin))
-                                    Text(text = "${it.latitude}, ${it.longitude}")
+                                    Text(text = address.toString())
                                 }
                             }
                         }

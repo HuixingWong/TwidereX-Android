@@ -23,6 +23,7 @@ package com.twidere.twiderex.di
 import android.accounts.AccountManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.location.Geocoder
 import android.location.LocationManager
 import androidx.room.Room
 import androidx.work.WorkManager
@@ -58,4 +59,7 @@ object AndroidModule {
     @Provides
     fun provideLocationManager(@ApplicationContext context: Context): LocationManager =
         context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+    @Provides
+    fun provideGeoCoder(@ApplicationContext context: Context): Geocoder = Geocoder(context)
 }

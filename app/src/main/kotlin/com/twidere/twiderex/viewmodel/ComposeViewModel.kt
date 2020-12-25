@@ -21,10 +21,7 @@
 package com.twidere.twiderex.viewmodel
 
 import android.Manifest.permission
-import android.location.Criteria
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
+import android.location.*
 import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.RequiresPermission
@@ -78,6 +75,7 @@ class DraftItemViewModel @AssistedInject constructor(
 class DraftComposeViewModel @AssistedInject constructor(
     draftRepository: DraftRepository,
     locationManager: LocationManager,
+    geocoder: Geocoder,
     composeAction: ComposeAction,
     factory: TwitterTweetsRepository.AssistedFactory,
     userRepositoryFactory: UserRepository.AssistedFactory,
@@ -87,6 +85,7 @@ class DraftComposeViewModel @AssistedInject constructor(
 ) : ComposeViewModel(
     draftRepository,
     locationManager,
+    geocoder,
     composeAction,
     factory,
     userRepositoryFactory,
@@ -116,6 +115,7 @@ class DraftComposeViewModel @AssistedInject constructor(
 open class ComposeViewModel @AssistedInject constructor(
     protected val draftRepository: DraftRepository,
     private val locationManager: LocationManager,
+    private val geocoder: Geocoder,
     protected val composeAction: ComposeAction,
     protected val factory: TwitterTweetsRepository.AssistedFactory,
     private val userRepositoryFactory: UserRepository.AssistedFactory,
@@ -153,7 +153,7 @@ open class ComposeViewModel @AssistedInject constructor(
         )
     }
 
-    val location = MutableLiveData<Location?>()
+    val location = MutableLiveData<Address?>()
     val excludedReplyUserIds = MutableLiveData<List<String>>(emptyList())
 
     val replyToUserName = liveData {
@@ -258,8 +258,15 @@ open class ComposeViewModel @AssistedInject constructor(
         val provider = locationManager.getBestProvider(criteria, true) ?: return
         locationManager.requestLocationUpdates(provider, 0, 0f, this)
         locationManager.getCachedLocation()?.let {
-            location.postValue(it)
+            decodeLocation(it)
         }
+    }
+
+    private fun decodeLocation(it: Location) {
+        geocoder.getFromLocation(it.latitude, it.longitude, 1)
+            .getOrNull(0)?.let {
+                location.postValue(it)
+            }
     }
 
     fun disableLocation() {
@@ -269,7 +276,7 @@ open class ComposeViewModel @AssistedInject constructor(
     }
 
     override fun onLocationChanged(location: Location) {
-        this.location.postValue(location)
+        decodeLocation(location)
     }
 
     // compatibility fix for Api < 22
