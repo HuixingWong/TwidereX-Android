@@ -20,14 +20,14 @@
  */
 package com.twidere.twiderex
 
-import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.twidere.services.App
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 @HiltAndroidApp
-class TwidereApp : Application(), Configuration.Provider {
+class TwidereApp : App(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 

@@ -20,7 +20,10 @@
  */
 package com.twidere.services.http
 
+import com.chuckerteam.chucker.api.ChuckerCollector
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.twidere.services.App
 import com.twidere.services.http.authorization.Authorization
 import com.twidere.services.serializer.DateQueryConverterFactory
 import com.twidere.services.utils.DEBUG
@@ -33,44 +36,51 @@ import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import kotlin.coroutines.coroutineContext
 
 @OptIn(ExperimentalSerializationApi::class)
 internal inline fun <reified T> retrofit(
-    baseUrl: String,
-    authorization: Authorization,
-    vararg interceptors: (chain: Interceptor.Chain) -> Response
+        baseUrl: String,
+        authorization: Authorization,
+        vararg interceptors: (chain: Interceptor.Chain) -> Response
 ): T {
     return Retrofit
-        .Builder()
-        .baseUrl(baseUrl)
-        .client(
-            OkHttpClient
-                .Builder()
-                .addInterceptor(AuthorizationInterceptor(authorization))
-                .apply {
-                    if (DEBUG) {
-                        addInterceptor(
-                            HttpLoggingInterceptor().apply {
-                                setLevel(HttpLoggingInterceptor.Level.BODY)
+            .Builder()
+            .baseUrl(baseUrl)
+            .client(
+                    OkHttpClient
+                            .Builder()
+                            .addInterceptor(AuthorizationInterceptor(authorization))
+                            .apply {
+                                if (DEBUG) {
+                                    addInterceptor(
+                                            HttpLoggingInterceptor().apply {
+                                                setLevel(HttpLoggingInterceptor.Level.BODY)
+                                            }
+                                    )
+                                }
+                                addInterceptor(ChuckerInterceptor.Builder(context = App.app)
+                                        .collector(ChuckerCollector(context = App.app))
+                                        .maxContentLength(250000L)
+                                        .redactHeaders(emptySet())
+                                        .alwaysReadResponseBody(false)
+                                        .build())
+                                addInterceptor {
+                                    it.proceed(
+                                            it.request().let { request ->
+                                                request.newBuilder().url(request.url.toString().replace("%20", "+")).build()
+                                            }
+                                    )
+                                }
+                                interceptors.forEach {
+                                    addInterceptor(it)
+                                }
                             }
-                        )
-                    }
-                    addInterceptor {
-                        it.proceed(
-                            it.request().let { request ->
-                                request.newBuilder().url(request.url.toString().replace("%20", "+")).build()
-                            }
-                        )
-                    }
-                    interceptors.forEach {
-                        addInterceptor(it)
-                    }
-                }
-                .build()
-        )
-        .addConverterFactory(ScalarsConverterFactory.create())
-        .addConverterFactory(JSON.asConverterFactory("application/json".toMediaType()))
-        .addConverterFactory(DateQueryConverterFactory())
-        .build()
-        .create(T::class.java)
+                            .build()
+            )
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(JSON.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(DateQueryConverterFactory())
+            .build()
+            .create(T::class.java)
 }

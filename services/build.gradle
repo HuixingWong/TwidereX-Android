@@ -1,6 +1,28 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm'
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id "org.jetbrains.kotlin.kapt"
     id "org.jetbrains.kotlin.plugin.serialization" version '1.4.21'
+}
+
+android {
+    compileSdkVersion global.compileSdkVersion
+    buildToolsVersion global.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion global.minSdkVersion
+        targetSdkVersion global.targetSdkVersion
+        versionCode global.versionCode
+        versionName global.versionName
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+        useIR = true
+    }
 }
 
 java {
@@ -26,5 +48,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:$versions.okhttp"
     implementation "com.squareup.okhttp3:logging-interceptor:$versions.okhttp"
 
+    debugImplementation "com.github.chuckerteam.chucker:library:3.4.0"
+    releaseImplementation "com.github.chuckerteam.chucker:library-no-op:3.4.0"
     testImplementation 'junit:junit:4.13.1'
 }

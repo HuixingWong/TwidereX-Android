@@ -41,7 +41,7 @@ internal object DateSerializer : KSerializer<Date> {
 
     override fun deserialize(decoder: Decoder): Date {
         val str = decoder.decodeString()
-        return getDateFormat().parse(str)
+        return getDateFormat().parse(str)!!
     }
 
     override fun serialize(encoder: Encoder, value: Date) {
