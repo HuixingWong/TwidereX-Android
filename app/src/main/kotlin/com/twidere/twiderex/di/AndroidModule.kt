@@ -25,8 +25,14 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.location.Geocoder
 import android.location.LocationManager
+import android.os.Build.VERSION.SDK_INT
 import androidx.room.Room
 import androidx.work.WorkManager
+import coil.ImageLoader
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.fetch.VideoFrameFileFetcher
+import coil.fetch.VideoFrameUriFetcher
 import com.twidere.twiderex.db.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -62,4 +68,17 @@ object AndroidModule {
 
     @Provides
     fun provideGeoCoder(@ApplicationContext context: Context): Geocoder = Geocoder(context)
+
+    @Provides
+    fun provideImageLoader(@ApplicationContext context: Context) : ImageLoader = ImageLoader.Builder(context)
+        .componentRegistry {
+            if (SDK_INT >= 28) {
+                add(ImageDecoderDecoder())
+            } else {
+                add(GifDecoder())
+            }
+            add(VideoFrameFileFetcher(context))
+            add(VideoFrameUriFetcher(context))
+        }
+        .build()
 }

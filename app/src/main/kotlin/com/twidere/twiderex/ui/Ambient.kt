@@ -29,6 +29,7 @@ import androidx.hilt.lifecycle.ViewModelAssistedFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
+import coil.ImageLoader
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 
@@ -41,3 +42,4 @@ val AmbientViewModelFactoriesMap =
 val AmbientActiveAccountViewModel = ambientOf<ActiveAccountViewModel>()
 val AmbientApplication = staticAmbientOf<Application>()
 val AmbientActivity = staticAmbientOf<Activity>()
+val AmbientLoader = staticAmbientOf<ImageLoader>()

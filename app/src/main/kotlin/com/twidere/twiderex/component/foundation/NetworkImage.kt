@@ -23,6 +23,8 @@ package com.twidere.twiderex.component.foundation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import com.twidere.twiderex.ui.AmbientLoader
+import dev.chrisbanes.accompanist.coil.AmbientImageLoader
 import dev.chrisbanes.accompanist.coil.CoilImage
 
 @Composable
@@ -37,6 +39,7 @@ fun NetworkImage(
         fadeIn = true,
         modifier = modifier,
         contentScale = contentScale,
-        loading = placeholder
+        loading = placeholder,
+        imageLoader = AmbientLoader.current
     )
 }

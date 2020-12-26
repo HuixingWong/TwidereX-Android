@@ -36,6 +36,7 @@ import androidx.hilt.lifecycle.HiltViewModelFactory
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.fragment.DialogFragmentNavigator
+import coil.ImageLoader
 import com.twidere.twiderex.action.AmbientStatusActions
 import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.foundation.AmbientInAppNotification
@@ -48,16 +49,10 @@ import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
-import com.twidere.twiderex.ui.AmbientActiveAccount
-import com.twidere.twiderex.ui.AmbientActiveAccountViewModel
-import com.twidere.twiderex.ui.AmbientActivity
-import com.twidere.twiderex.ui.AmbientApplication
-import com.twidere.twiderex.ui.AmbientViewModelProviderFactory
-import com.twidere.twiderex.ui.AmbientWindow
-import com.twidere.twiderex.ui.AmbientWindowPadding
-import com.twidere.twiderex.ui.ProvideWindowPadding
+import com.twidere.twiderex.ui.*
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.accompanist.coil.AmbientImageLoader
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -85,6 +80,8 @@ class TwidereXActivity : FragmentActivity() {
 
     @Inject
     lateinit var inAppNotification: InAppNotification
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,6 +106,7 @@ class TwidereXActivity : FragmentActivity() {
                 AmbientStatusActions provides statusActions,
                 AmbientActivity provides this,
                 AmbientActiveAccountViewModel provides accountViewModel,
+                AmbientLoader provides imageLoader
             ) {
                 ProvidePreferences(
                     preferencesHolder,
